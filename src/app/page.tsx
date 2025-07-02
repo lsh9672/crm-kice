@@ -40,6 +40,7 @@ export default function Home() {
         setQuestions(data.questions);
         localStorage.setItem('quiz_questions', JSON.stringify(data.questions));
         localStorage.setItem('quiz_user_name', userName.trim());
+        localStorage.setItem('quiz_exam_file', selectedFile);
         router.push('/quiz');
       } else {
         setError('문제 추출에 실패했습니다.');
@@ -104,7 +105,7 @@ export default function Home() {
                   opacity: loading || !userName.trim() ? 0.6 : 1,
                 }}
               >
-                {loading ? '문제 불러오는 중...' : '시험 시작'}
+                {loading ? (<span><span className="spinner" style={{marginRight:8,verticalAlign:'middle',display:'inline-block',width:18,height:18,border:'3px solid #fff',borderTop:'3px solid #0070f3',borderRadius:'50%',animation:'spin 1s linear infinite'}}></span>문제 불러오는 중...</span>) : '시험 시작'}
               </button>
               {error && <p style={{ color: 'red', marginTop: 16 }}>{error}</p>}
             </div>

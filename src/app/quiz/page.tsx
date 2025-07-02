@@ -16,12 +16,18 @@ export default function QuizPage() {
   const [score, setScore] = useState(0);
   const [wrongIndexes, setWrongIndexes] = useState<number[]>([]);
   const [userName, setUserName] = useState('');
+  const [examFileName, setExamFileName] = useState('');
+  const [rank, setRank] = useState<number | null>(null);
+  const [totalParticipants, setTotalParticipants] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const data = localStorage.getItem('quiz_questions');
     const name = localStorage.getItem('quiz_user_name') || '';
+    const examFile = localStorage.getItem('quiz_exam_file') || '';
     setUserName(name);
+    setExamFileName(examFile);
     if (data) {
       const parsed = JSON.parse(data);
       setQuestions(parsed);
@@ -44,7 +50,7 @@ export default function QuizPage() {
       if (answers[i] === q.answer) correct++;
       else wrong.push(i);
     });
-    setScore(correct * 4); // 각 문제 4점
+    setScore(correct * 1); // 각 문제 1점
     setWrongIndexes(wrong);
     setSubmitted(true);
     // 오답 정보도 localStorage에 저장
@@ -53,6 +59,38 @@ export default function QuizPage() {
 
   const handleWrongView = () => {
     router.push('/quiz/wrong');
+  };
+
+  const handleFinishExam = async () => {
+    setSubmitting(true);
+    try {
+      const response = await fetch('/api/submit-result', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userName,
+          score,
+          examFileName
+        })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        setRank(data.rank);
+        setTotalParticipants(data.totalParticipants);
+        alert('정상적으로 종료되었습니다.');
+      } else {
+        alert('결과 저장에 실패했습니다: ' + data.error);
+      }
+    } catch (error) {
+      alert('결과 저장 중 오류가 발생했습니다.');
+    } finally {
+      setSubmitting(false);
+      router.replace('/');
+    }
   };
 
   if (!questions.length) return null;
@@ -90,6 +128,13 @@ export default function QuizPage() {
           {wrongIndexes.length > 0 && (
             <button onClick={handleWrongView} style={{ padding: '14px 32px', fontSize: 18, background: '#ff5a5f', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>오답 해설 보기</button>
           )}
+          <button
+            onClick={handleFinishExam}
+            disabled={submitting}
+            style={{ marginTop: 24, padding: '14px 32px', fontSize: 18, background: '#0070f3', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', display: 'block', width: '100%', opacity: submitting ? 0.6 : 1 }}
+          >
+            {submitting ? (<span><span className="spinner" style={{marginRight:8,verticalAlign:'middle',display:'inline-block',width:18,height:18,border:'3px solid #fff',borderTop:'3px solid #0070f3',borderRadius:'50%',animation:'spin 1s linear infinite'}}></span>결과 저장 중...</span>) : '시험종료'}
+          </button>
         </div>
       )}
     </main>
