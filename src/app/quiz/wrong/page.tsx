@@ -29,9 +29,10 @@ export default function WrongPage() {
   return (
     <main style={{ maxWidth: 600, margin: '40px auto', padding: 24 }}>
       <h1>오답 해설</h1>
-      <ol>
+      <ol style={{ listStyle: 'none', padding: 0 }}>
         {wrongIndexes.map(idx => (
           <li key={idx} style={{ marginBottom: 24 }}>
+            <div style={{ fontWeight: 700, marginBottom: 4 }}>문제 {idx + 1}번</div>
             <div><b>{questions[idx].question}</b></div>
             <div style={{ color: 'red', marginTop: 8 }}>내 답: {answers[idx] !== -1 ? `${answers[idx] + 1}. ${questions[idx].options[answers[idx]]}` : '미응답'}</div>
             <div style={{ color: 'green', fontWeight: 700, marginTop: 4 }}>정답: {questions[idx].answer !== null ? `${questions[idx].answer + 1}. ${questions[idx].options[questions[idx].answer]}` : '없음'}</div>

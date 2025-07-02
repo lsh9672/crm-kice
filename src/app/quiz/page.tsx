@@ -42,7 +42,7 @@ export default function QuizPage() {
     setAnswers(prev => prev.map((a, i) => (i === qIdx ? optIdx : a)));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     let correct = 0;
     const wrong: number[] = [];
@@ -55,13 +55,8 @@ export default function QuizPage() {
     setSubmitted(true);
     // 오답 정보도 localStorage에 저장
     localStorage.setItem('quiz_wrong', JSON.stringify({questions, answers, wrongIndexes: wrong}));
-  };
 
-  const handleWrongView = () => {
-    router.push('/quiz/wrong');
-  };
-
-  const handleFinishExam = async () => {
+    // 시험 제출 시 Google Sheet로 데이터 전송
     setSubmitting(true);
     try {
       const response = await fetch('/api/submit-result', {
@@ -71,17 +66,15 @@ export default function QuizPage() {
         },
         body: JSON.stringify({
           userName,
-          score,
+          score: correct * 1,
           examFileName
         })
       });
-
       const data = await response.json();
-      
       if (response.ok) {
         setRank(data.rank);
         setTotalParticipants(data.totalParticipants);
-        alert('정상적으로 종료되었습니다.');
+        alert('정상적으로 제출되었습니다.');
       } else {
         alert('결과 저장에 실패했습니다: ' + data.error);
       }
@@ -89,8 +82,15 @@ export default function QuizPage() {
       alert('결과 저장 중 오류가 발생했습니다.');
     } finally {
       setSubmitting(false);
-      router.replace('/');
     }
+  };
+
+  const handleWrongView = () => {
+    router.push('/quiz/wrong');
+  };
+
+  const handleFinishExam = () => {
+    router.replace('/');
   };
 
   if (!questions.length) return null;
