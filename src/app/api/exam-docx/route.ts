@@ -20,9 +20,9 @@ function parseQuestionsFromText(text: string) {
   const questions = [];
   for (const block of blocks) {
     const q = {} as any;
-    const qMatch = block.match(/문제\s*:\s*([\s\S]*?)(?=보기|정답|해설|$)/);
+    const qMatch = block.match(/문제\s*:\s*([\s\S]*?)(?=보기\s*:|정답\s*:|해설\s*:|$)/);
     q.question = qMatch ? qMatch[1].replace(/\n/g, ' ').trim() : '';
-    const oMatch = block.match(/보기\s*:\s*([\s\S]*?)(?=정답|해설|$)/);
+    const oMatch = block.match(/보기\s*:\s*([\s\S]*?)(?=정답\s*:|해설\s*:|$)/);
     if (oMatch) {
       q.options = parseOptions(oMatch[1]);
     } else {
@@ -60,4 +60,4 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     return NextResponse.json({ error: '파일을 읽거나 파싱할 수 없습니다.' }, { status: 500 });
   }
-} 
+}
