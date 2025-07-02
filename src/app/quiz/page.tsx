@@ -126,7 +126,11 @@ export default function QuizPage() {
           <h2>채점 결과</h2>
           <p style={{ fontSize: 24, fontWeight: 700, marginBottom: 32 }}>{userName ? `${userName}님이 획득한 점수는` : ''} {score}점입니다</p>
           {wrongIndexes.length > 0 && (
-            <button onClick={handleWrongView} style={{ padding: '14px 32px', fontSize: 18, background: '#ff5a5f', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>오답 해설 보기</button>
+            <button 
+              onClick={handleWrongView} 
+              disabled={submitting} 
+              style={{ padding: '14px 32px', fontSize: 18, background: '#ff5a5f', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.6 : 1 }}
+            >오답 해설 보기</button>
           )}
           <button
             onClick={handleFinishExam}
